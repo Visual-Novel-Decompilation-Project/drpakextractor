@@ -1,0 +1,14 @@
+[package]
+name = "DRPAKExtractor"
+version = "0.1.0"
+authors = ["breadbyte <14045257+breadbyte@users.noreply.github.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+tinytga = "0.3.2"
+clap = "3.0.0-beta.2"
+serde_json = "1.0"
+serde = { version = "1.0.124", features = ["derive"] }
+encoding_rs = "0.8.28"
