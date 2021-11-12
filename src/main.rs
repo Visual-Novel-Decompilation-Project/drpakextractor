@@ -33,15 +33,15 @@ fn main() {
         let currentDir = env::current_dir().unwrap();
 
         for file in paksDir {
-            if file.unwrap().path().as_path().extension() != ".pak" {
+            if file.unwrap().path().as_path().extension() != "pak" {
                 continue;
             }
 
-            let mut folderName = "extracted_".to_string();
-            folderName = folderName + &file.as_ref().unwrap().file_name().to_str().unwrap();
+            let mut folderName = std::env::current_dir().unwrap().to_str().unwrap().to_string() + &"\\extracted_".to_string();
+            folderName = folderName + &unwrapped.path().file_stem().unwrap().to_str().unwrap();
 
             fs::create_dir_all(&currentDir.join(Path::new(&folderName)));
-            processPakFile(&file.unwrap().path().to_string_lossy(), &opts.textureFolder, &opts.noesisExe, &opts.mapFile, &opts.useFbx, &Some(&folderName));
+            processPakFile(&unwrapped.path().to_string_lossy(), &opts.textureFolder, &opts.noesisExe, &opts.mapFile, &opts.useFbx, &Some(&folderName));
             env::set_current_dir(&currentDir.as_path());
         }
     }
@@ -55,14 +55,11 @@ fn main() {
         let file = pak_file_path;
 
         if extraction_folder.is_some() {
-            let mut exFolder = extraction_folder.unwrap().to_string();
-            exFolder.push(Path::file_stem(&pak_file_path.as_ref()).unwrap().to_string_lossy().parse().unwrap());
-            folderPath = exFolder;
+            folderPath = extraction_folder.unwrap().to_string();
         }
         else {
             folderPath =  String::from("extracted_".to_string().add(&*Path::file_stem(&pak_file_path.as_ref()).unwrap().to_string_lossy()));
         }
-        folderPath = String::from(env::current_dir().unwrap().join(Path::new(&folderPath)).to_str().unwrap());
 
         fs::create_dir_all(&folderPath);
         env::set_current_dir(&folderPath);
@@ -372,7 +369,12 @@ fn main() {
                         // File paths in the GMO can be 'deformed' (i.e using backslash instead of fwdslash for paths) so we need to fix this.
                         // Ideally this would be a fix within Noesis itself.
                         let replaced = str.replace("\\", "/");
-                        fs::write(x.as_ref().unwrap().path(), replaced).unwrap();
+
+                        // Replace colon in file paths with an underscore.
+                        // Helps with programs that don't like colons.
+                        let secondReplace = replaced.replace(":/", "_/");
+
+                        fs::write(x.as_ref().unwrap().path(), secondReplace).unwrap();
                         println!("Fixed {}", x.as_ref().unwrap().path().file_stem().unwrap().to_string_lossy());
                     }
                 }
